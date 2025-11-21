@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Section from '../../../components/templates/Section';
 import CreateModal from '../../../components/organisms/CreateModal';
 import Button from '../../../components/atoms/Button';
-import ProductService from '../../../services/ProductService';
+import ProductService from '../../../services/ProductosService.jsx';
 import { generarMensaje } from '../../../utils/GenerarMensaje';
 
 // Definición local de la estructura de la página (simulando tu homeData)
