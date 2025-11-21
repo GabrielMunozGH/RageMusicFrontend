@@ -1,0 +1,92 @@
+mostrar arbol de datos en terminal (creo que solo en mac)
+tree -I 'node_modules|dist|.git|build' -a
+
+comandos git para subir (ya estando conectado al github)
+git add .
+git commit -m "lo que se hizo"
+git push origin main
+
+comandos para inicializar el proyecto
+npm install
+npm run dev
+
+## "el jakeo"
+como sabrán, render se "duerme" a los 5 minutos despues de no tener uso, por lo mismmo hice un "jakeo"
+el sitio uptimerobot permite hacer consultas cada 5 minutos a un sitio, por lo que en el backend, 
+en este caso lo puse en naves, pero ustedes deberán hacer un controller justamente para estando, con el siguiente código
+
+@GetMapping("/health")
+public ResponseEntity<String> health() {
+    return ResponseEntity.ok("OK");
+}
+
+este justamente retorna un ok cada 5 minutos, usando el uptimerobot, lo que si deben agregar esta dependencia al pom
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+y en el application.properties
+management.endpoints.web.exposure.include=health,info
+management.endpoint.health.show-details=always
+este de abajo, justamente ya está, pero se tiene que editar con lo que está ahora
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration,org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration
+
+con este pequeño cambio, se puede tener el backend andando siempre sin necesidad de pagar los 7 dólares
+
+##cambios en el App.jsx
+
+algo que se nota al seguir agregando páginas es que justamente se va haciendo muy grande ese código, por lo mismo, una manera de liberarlo y dejarlo más dinámico
+se hico la carpeta routes dentro del src, esta contiene el config.jsx dentro de ese archivo está todo explicado para que sea más simple el hacer el cambio,
+además de que el mismo archivo App.jsx está ya listo para este dinamismo, si no se sienten cómodos haciendo eso, está bien, no tienen que hacer ese cambio, pero
+en caso de estresarse viendo tanto código, pueden hacerlo, este es un cambio opcional la verdad
+
+##tablas dinámicas
+se agregaron tablas dinámicas, estas permiten llegar y llenarse, así solo ponen los datos, la manera de hacerlo es así
+
+{
+  type: "table",
+  title: "Usuarios",
+  columns: ["ID", "Nombre", "Edad"],
+  data: [[1, "Juan", 28], [2, "Ana", 34]]
+}
+
+esto tomando en cuenta el template "Section.jsx" una manera rápida y simple de hacer tablas
+
+##popup dinámico
+en este caso por comodida, generé un pop-up dinámico, así en vez de hacer páginas para crear o editar, solo se presiona el crear se abre y listo
+se actualizó el input de átomo para que se pueda hacer, añadiendo los textarea, en esta versión no está lo de subir las imagenes a la api externa, pero
+en el próximo cambio si estará, así que tocara esperar un poco para eso
+
+##subir imagenes 
+para esto vamos a usar imagebb https://imgbb.com/ se crean una cuenta y luego van a este enlace 
+https://api.imgbb.com/ que nos ayudará a generar nuestro key para poder enviar imágenes a esta api, este valor lo podemos dejar plano
+en nuestro proyecto o para agregar una capa de protección vamos a guardarlo como variable de entorno en vercel, para hacerlo vamos a ir a 
+nuestro proyecto y en setting, seleccionamos Environments y ahí Add Environment Variable, en mi caso la agregué como VITE_IMGBB_API_KEY que es el 
+valor que verán en el proyecto, recordar que para subir imagenes se usa la url
+
+https://api.imgbb.com/1/upload
+
+ahora vamos a añadir una dependencia a nuestro proyecto que se llama react-image-file-resizer, para añadirla vamos a escribir en la terminal
+
+npm install react-image-file-resizer 
+
+(dentro de la carpeta del proyecto)
+
+generé un archivo llamado UploadImage.js dentro de utils, ahí está todo el tejemaneje de como se usa, el create modal, se actualizó
+para ahora aceptar input de imagen, igual que se creó el átomo InputFile que nos servirá para lo que quieran.
+
+ahora el proyecto hace lo siguiente:
+
+- comprime la imagen y al transforma a webp
+- la envía con un post a imgbb y recibe la ruta de esta
+- esta ruta la guarda en la base de datos
+
+esto hace que nuestro proyecto no dependa de espacio en el servidor ni nada, optimizando recursos
+
+## se agrega el editar y eliminar
+algo más que necesario en cualquier administrador, es justamente el editar y eliminar, en este caso
+se actualizó nuestro create modal para permitir el poder llenarlo con los datos del objeto y así 
+editarlo, en cuanto al eliminar aparece un boton que pregunta si deseamos eliminar o no, ahora falta terminar los otros crud
+y la vista de usuario, pero con lo avanzado ahora, la verdad que es lo de menos, seguiré actualizando por que me gusta star wars
+y creo que es una buena guía para ustedes, que la fuerza los acompañe siempre <3
