@@ -8,6 +8,11 @@ export const publicLinks = [
         to: '/productos'   
     },
     {
+        label: 'Carrito',
+        to: '/carrito' 
+    },
+
+    {
         label: 'Login',
         to: '/auth/login'
     }
