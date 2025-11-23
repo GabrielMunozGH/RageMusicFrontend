@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ProductosService from '../../services/ProductosService.jsx';
 import { useCart } from '../../context/CartContext'; 
 import { generarMensaje } from '../../utils/GenerarMensaje';
-import '../../assets/css/global.css';
+
 
 const Productos = () => {
     const [productos, setProductos] = useState([]);
