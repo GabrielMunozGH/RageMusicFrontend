@@ -41,20 +41,17 @@ const Perfil = () => {
             const dataToSend = { ...form };
             if (!dataToSend.contrasena) delete dataToSend.contrasena;
 
-            // 1. Actualizar en Backend
-            // Asumimos que user.id viene del token o del contexto
+           
             const response = await UserService.updateUser(user.id, dataToSend, token);
             
-            // 2. Actualizar Contexto/LocalStorage con los nuevos datos
-            // Mantenemos el token y actualizamos la info del usuario
+            
             const updatedUser = { ...user, ...dataToSend };
-            // Nota: Si tu backend devuelve el usuario actualizado en response.data, usa eso mejor:
-            // const updatedUser = response.data;
+            
 
-            // Actualizamos la sesión local
+           
             localStorage.setItem('user', JSON.stringify(updatedUser));
             
-            // Actualizamos el contexto (truco: usamos login para refrescar el estado)
+            
             login(updatedUser);
 
             generarMensaje('Perfil actualizado correctamente', 'success');
@@ -68,7 +65,7 @@ const Perfil = () => {
         }
     };
 
-    // Configuración del Formulario para tu componente Forms
+    
     const editFormStructure = [
         {
             type: "inputs",
@@ -162,7 +159,7 @@ const Perfil = () => {
                                 <p className="text-gray-800 text-lg font-medium border-b pb-2">{user.correo || user.email}</p>
                             </div>
                             
-                            {/* Aquí podrías agregar historial de compras más adelante */}
+                           
                         </div>
                     )}
                 </div>

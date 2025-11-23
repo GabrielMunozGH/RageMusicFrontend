@@ -35,7 +35,7 @@ try {
                 "password": form.contrasena,
 
                 rol: {
-                    "id": 1 
+                    "id": 2 
                 }
             };
 

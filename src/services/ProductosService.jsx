@@ -1,34 +1,45 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://ragemusicbackend.onrender.com/api/productos';
+const API_URL = "https://ragemusicbackend.onrender.com/api/productos";
 
-class ProductService {
+const ProductosService = {
+    // Obtener todos los productos
+    getAllProducts: async () => {
+        return await axios.get(API_URL);
+    },
 
-    getAllProductos() {
-        return axios.get(`${BASE_URL}`);
+    // Crear producto
+    createProduct: async (productData, token) => {
+        const config = {
+            headers: {
+                // CORRECCIÓN AQUÍ: Usamos comillas invertidas ``
+                Authorization: `Bearer ${token}`, 
+                'Content-Type': 'application/json'
+            }
+        };
+        return await axios.post(API_URL, productData, config);
+    },
+
+    // Actualizar producto
+    updateProduct: async (id, productData, token) => {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        };
+        return await axios.put(`${API_URL}/${id}`, productData, config);
+    },
+
+    // Eliminar producto
+    deleteProduct: async (id, token) => {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        };
+        return await axios.delete(`${API_URL}/${id}`, config);
     }
+};
 
-    getProductById(id) {
-        return axios.get(`${BASE_URL}/${id}`);
-    }
-
-    createProduct(producto, token){
-        return axios.post(`${BASE_URL}`, producto, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-    }
-
-    updateProduct(id, producto, token){
-        return axios.put(`${BASE_URL}/${id}`, producto, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-    }
-
-    deleteProduct(id, token){
-        return axios.delete(`${BASE_URL}/${id}`, {
-            headers: { Authorization: `Bearer ${token}` }
-        });
-    }
-}
-
-export default new ProductService();
+export default ProductosService;
