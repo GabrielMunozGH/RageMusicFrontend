@@ -1,44 +1,68 @@
-// src/services/VentasService.jsx
+
+import axios from 'axios';
+
+const API_URL = 'https://ragemusicbackend.onrender.com/api/ventas';
 
 class VentasService {
+  async crearVenta(ventaData, token) {
+    try {
+      const userRaw = localStorage.getItem('user');
+      const user = userRaw ? JSON.parse(userRaw) : null;
 
-    // Simula el POST /api/ventas (Guardar compra)
-    crearVenta(ventaData) {
-        return new Promise((resolve) => {
-            // 1. Obtener compras existentes
-            const comprasGuardadas = JSON.parse(localStorage.getItem('historial_compras')) || [];
-            
-            // 2. Crear una "ID" falsa y fecha
-            const nuevaVenta = {
-                ...ventaData,
-                id: Date.now(), // Usamos la fecha como ID único
-                fecha: new Date().toISOString(),
-                estado: 'PENDIENTE'
-            };
+      const payload = {
+        ...ventaData,
+        // requerido por validarVenta del backend:
+        usuario: user?.id ? { id: user.id } : undefined,
+      };
 
-            // 3. Guardar en el array
-            comprasGuardadas.push(nuevaVenta);
-            localStorage.setItem('historial_compras', JSON.stringify(comprasGuardadas));
+      console.log('[VentasService] POST /ventas payload:', payload);
 
-            // Simular retardo de red
-            setTimeout(() => {
-                resolve({ data: nuevaVenta });
-            }, 500);
-        });
+      const res = await axios.post(API_URL, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 15000,
+        validateStatus: (s) => s >= 200 && s < 500, // para leer mensajes en 4xx
+      });
+
+      if (res.status >= 400) {
+        console.error('[VentasService] Respuesta error', res.status, res.data);
+        throw new Error(res.data?.message || `Error ${res.status}`);
+      }
+
+      return res.data;
+    } catch (error) {
+      console.error('Error al crear la venta:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      throw error;
     }
+  }
 
-    // Simula el GET /api/ventas/mis-compras (Leer compras)
-    getMisCompras() {
-        return new Promise((resolve) => {
-            const comprasGuardadas = JSON.parse(localStorage.getItem('historial_compras')) || [];
-            
-            // Simular retardo
-            setTimeout(() => {
-                resolve({ data: comprasGuardadas.reverse() }); // Las más nuevas primero
-            }, 500);
-        });
+  async getMisCompras(token) {
+    try {
+      const res = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 15000,
+        validateStatus: (s) => s >= 200 && s < 500,
+      });
+      if (res.status >= 400) {
+        console.error('[VentasService] Respuesta error GET', res.status, res.data);
+        throw new Error(res.data?.message || `Error ${res.status}`);
+      }
+      return res.data;
+    } catch (error) {
+      console.error('Error al obtener compras:', {
+        message: error.message,
+        status: error.response?.status,
+        data: error.response?.data,
+      });
+      throw error;
     }
+  }
 }
 
-// --- ¡ESTA LÍNEA ES LA QUE TE FALTA! ---
 export default new VentasService();

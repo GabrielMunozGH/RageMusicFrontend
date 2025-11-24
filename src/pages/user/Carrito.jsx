@@ -54,7 +54,7 @@ export default function Carrito() {
     }
   };
 
-  // ✅ Si el carrito está vacío
+  // Si el carrito está vacío
   if (cart.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center justify-center">

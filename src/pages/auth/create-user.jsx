@@ -130,11 +130,36 @@ try {
     ];
 
     return (
-        <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-orange-800 p-4">
-            <form onSubmit={handleSubmit} className="w-full max-w-md space-y-10 rounded-2xl bg-white/10 p-10 backdrop-blur-xl shadow-2xl">
-                <Forms content={formStructure} />
-            </form>
-        </main>
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-900 via-blue-900 to-orange-800 p-4">
+      <div className="w-full max-w-md">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-10 rounded-2xl bg-white/10 p-10 backdrop-blur-xl shadow-2xl border border-white/20"
+        >
+          <Forms content={formStructure} />
+        </form>
+        <div className="mt-4 flex justify-end">
+          {/* Opción 1: botón nativo */}
+          <button
+            type="button"
+            disabled={loading}
+            onClick={() => {
+               navigate('/');
+            }}
+            className={`px-6 py-2 rounded-sm font-bold transition-all ${
+              loading
+                ? 'bg-gray-500 text-white cursor-not-allowed'
+                : 'bg-indigo-600 hover:bg-indigo-400 text-white'
+            }`}
+            aria-label="Volver"
+          >
+            Volver
+          </button>
+
+        </div>
+      </div>
+    </main>
+
     );
 };
 
