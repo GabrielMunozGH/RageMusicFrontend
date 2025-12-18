@@ -1,13 +1,10 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Forms from '../../components/templates/Forms';
 import { generarMensaje } from '../../utils/GenerarMensaje';
 import UserService from '../../services/UserService';
 import { useAuth } from '../../context/AuthContext';
-import Button from "../../components/atoms/Button";
 
-// Datos del formulario definidos localmente para evitar errores
 const loginData = [
   {
     type: "text",
@@ -24,10 +21,10 @@ const loginData = [
     inputs: [
       {
         type: "text",
-        placeholder: "Correo electrónico",
-        name: "correo",
+        placeholder: "Nombre de usuario",
+        name: "nombre",
         required: true,
-        autoComplete: "email",
+        autoComplete: "username",
         className: "w-full border-b-2 bg-transparent text-lg duration-300 focus-within:border-indigo-500 mb-4 text-white placeholder-gray-400 outline-none",
       },
       {
@@ -59,7 +56,7 @@ const loginData = [
 ];
 
 const Login = () => {
-  const [form, setForm] = useState({ correo: "", contrasena: "" });
+  const [form, setForm] = useState({ nombre: "", contrasena: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -69,8 +66,9 @@ const Login = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.correo || !form.contrasena) {
+    if (e) e.preventDefault();
+
+    if (!form.nombre || !form.contrasena) {
       generarMensaje('Completa todos los campos', 'warning');
       return;
     }
@@ -79,47 +77,37 @@ const Login = () => {
 
     try {
       const credenciales = {
-        correo: form.correo,
-        contrasena: form.contrasena,
-        email: form.correo,
-        password: form.contrasena
+        nombre: form.nombre.trim(),
+        contrasena: form.contrasena
       };
 
       const response = await UserService.login(credenciales);
-      const data = response.data;
-
-      let usuario = data.user || data.usuario || data;
-      const token = data.token || data.jwt || "token-simulado-session-valida";
+      const usuario = response.data;
 
       if (!usuario || !usuario.id) {
-        throw new Error("El servidor no devolvió los datos del usuario.");
+        throw new Error("Credenciales inválidas");
       }
 
+      const token = usuario.token || "session-active";
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(usuario));
 
       login(usuario);
-
-      generarMensaje(`¡Bienvenido ${usuario.nombre || 'Usuario'}!`, 'success');
+      generarMensaje(`¡Bienvenido ${usuario.nombre}!`, 'success');
 
       setTimeout(() => {
-        const rolId = usuario.rol?.id || usuario.rol;
-        const esAdmin = rolId === 1 || usuario.rol === 'ADMIN' || usuario.rol?.nombre === 'ADMIN';
-        
-        if (esAdmin) {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/');
-        }
+        const rolNombre = usuario.rol?.rol || usuario.rol; 
+        const esAdmin = rolNombre === 'ADMIN' || usuario.rol?.id === 1;
+        navigate(esAdmin ? '/admin/dashboard' : '/');
       }, 1500);
 
     } catch (error) {
-      console.error(error);
-      const msg = error.response?.data?.message || 'Credenciales inválidas';
-      generarMensaje(msg, 'error');
-    } finally {
+      console.error("Error en login:", error);
+      const msg = error.response?.data || 'Usuario o contraseña incorrectos';
+      generarMensaje(typeof msg === 'string' ? msg : 'Error de autenticación', 'error');
+      
       setLoading(false);
-      setForm({ correo: "", contrasena: "" });
+      setForm({ nombre: "", contrasena: "" });
     }
   };
 
@@ -138,7 +126,6 @@ const Login = () => {
       return {
         ...item,
         key: index,
-        onClick: handleSubmit,
         disabled: loading,
         text: loading ? "Iniciando..." : item.text,
       };
@@ -173,25 +160,16 @@ const Login = () => {
         <Forms content={formDataWithHandlers} />
       </form>
         
-        <div className="w-full max-w-md mt-4 flex justify-end">
-          <button
-            type="button"
-            disabled={loading}
-            onClick={() => {
-              navigate('/');
-            }}
-            className={`px-6 py-2 rounded-sm font-bold transition-all ${
-              loading
-                ? 'bg-indigo-600 text-white cursor-not-allowed'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white'
-            }`}
-            aria-label="Volver"
-          >
-            Volver
-          </button>
-        </div>
-
-
+      <div className="w-full max-w-md mt-4 flex justify-end">
+        <button
+          type="button"
+          disabled={loading}
+          onClick={() => navigate('/')}
+          className="px-6 py-2 rounded-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-all disabled:opacity-50"
+        >
+          Volver
+        </button>
+      </div>
     </main>
   );
 };
