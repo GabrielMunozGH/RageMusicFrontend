@@ -16,19 +16,18 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     }, []);
 
-    const login = (userData) => {
-        localStorage.setItem('user', JSON.stringify(userData));
-        setUser(userData);
-    };
-
-    const logout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
-    };
-
-    return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    // En AuthProvider, añade esta pequeña utilidad
+const login = (userData) => {
+    // Asegúrate de que userData incluya { user: {...}, token: "ey..." }
+    localStorage.setItem('user', JSON.stringify(userData));
+    setUser(userData);
 };
+
+// Y expón el token fácilmente
+const token = user?.token || null;
+
+return (
+    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+        {children}
+    </AuthContext.Provider>
+);
